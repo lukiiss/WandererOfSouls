@@ -15,6 +15,6 @@ namespace WandererOfSouls
         int MaxHP { get; set; }
         int Strenght { get; set; }
         decimal CritChance { get; set; }
-        enum skills;
+        enum Skills;
     }
 }

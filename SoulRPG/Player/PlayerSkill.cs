@@ -13,34 +13,33 @@ namespace WandererOfSouls
         public int Damage { get; set; }
         public decimal DamageMultiplayer { get; set; }
         public int EntityId { get; set; }
-        public void UseSkill(int skillId,int id)
+        public void UseSkill(int skillId,int enemyId,List<Enemy> enemies,List<Player> players,List<PlayerSkill> playerSkills)
         {
             EnemyService enemyService = new EnemyService();
             PlayerSkillService playerSkillService = new PlayerSkillService();
-            var enemies = enemyService.AllEnemies();
-            var players = new List<Player>();
-
             int enemyIndex = -1;
             int skillIndex = -1;
             int damage;
             for (int i = 0; i < enemies.Count; i++)
             {
-                if (id == enemies[i].Id)
+                if (enemyId == enemies[i].Id)
                 {
                     enemyIndex = i;
                 }
             }   
-            for(int i = 0; i < players[0].Skills.Count; i++) 
+            for(int i = 0; i < playerSkills.Count; i++) 
             { 
-                if(skillId == players[0].Id) 
+                if(skillId == playerSkills[i].Id) 
                 {   
                     skillIndex = i;
                 }
             }
             if (skillIndex != -1 && enemyIndex != -1)
             {
-                damage = players[0].Skills[skillIndex].Damage;
-                enemies[enemyIndex].HP = -damage;
+                damage = playerSkills[skillIndex].Damage;
+                enemies[enemyIndex].HP = enemies[enemyIndex].HP - damage;
+                Console.WriteLine("you use an attack named " + playerSkills[skillIndex].Name + " and dealt " + playerSkills[skillIndex].Damage + " dmg.");
+                Thread.Sleep(2000);
             }
         }
 

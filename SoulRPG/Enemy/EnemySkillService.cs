@@ -8,13 +8,15 @@ namespace WandererOfSouls
 {
     public class EnemySkillService
     {
-        public EnemySkill AddNewSkill(int id, string name, int damage, int enemyId)
+        public EnemySkill AddNewSkill(string name, int damage, int enemyId,List<Enemy> enemies,List<EnemySkill> enemySkills)
         {
-            List<Enemy> enemies = new List<Enemy>();
-            List<EnemySkill> enemiesSkills = new List<EnemySkill>();
-
             decimal enemySkillDamageMultiplayer = 1;
             int enemySkillDamage = (int)Math.Round(damage * enemySkillDamageMultiplayer);
+            int lastId = 0;
+            if(enemies.Count > 0) 
+            { 
+                lastId = enemies[enemies.Count - 1].Id;
+            }
             foreach (Enemy enemy in enemies)
             {
                 if (enemy.Id == enemyId)
@@ -25,8 +27,9 @@ namespace WandererOfSouls
                     }
                 }
             }
-            EnemySkill enemySkill = new EnemySkill { Id = id, Name = name, Damage = enemySkillDamage, DamageMultiplayer = enemySkillDamageMultiplayer, EntityId = enemyId };
-            enemiesSkills.Add(enemySkill);
+            int currentId = lastId + 1;
+            EnemySkill enemySkill = new EnemySkill { Id = currentId, Name = name, Damage = enemySkillDamage, DamageMultiplayer = enemySkillDamageMultiplayer, EntityId = enemyId };
+            enemySkills.Add(enemySkill);
             return enemySkill;
         }
     }

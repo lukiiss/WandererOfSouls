@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,31 +11,6 @@ namespace WandererOfSouls
 {
     public class MenuActionService
     {
-        private List<MenuAction> menuactions = new List<MenuAction>();
-        public MenuAction NewMenuAction(int id, string name, string menuName)
-        {
-            MenuAction menuaction = new MenuAction() { Id = id, Name = name, MenuName = menuName };
-            menuactions.Add(menuaction);
-            return menuaction;
-        }
-        public List<MenuAction> GetMenuActionByMenuName(string menuname)
-        {
-            List<MenuAction> elements = new List<MenuAction>();
-            foreach (MenuAction element in menuactions)
-            {
-                if (element.MenuName == menuname)
-                {
-                    elements.Add(element);
-                }
-            }
-            return elements;
-        }
-
-        public void SpaceToContinue()
-        {
-            Console.WriteLine("Clicke SPACE to continue.");
-            Console.ReadKey();
-        }
 
         public void RedTextColor(string number , string text)
         {
@@ -46,9 +22,13 @@ namespace WandererOfSouls
         public void choices(string first,string? second,string? third,string? fourth)
         {
             var actionService = new MenuActionService();
+
             Console.WriteLine("What do you do?");
             actionService.RedTextColor("1", first);
-            actionService.RedTextColor("2", second);
+            if (second != null)
+            {
+                actionService.RedTextColor("2", second);
+            }
             if (third != null)
             {
                 actionService.RedTextColor("3", third);
@@ -60,7 +40,7 @@ namespace WandererOfSouls
             Console.WriteLine("Choose an option.");
         }
 
-        public int StartGameView()
+        public void StartGameView()
         {
             PlayerService playerService = new PlayerService();
             MenuActionService actionService = new MenuActionService();
@@ -68,17 +48,23 @@ namespace WandererOfSouls
             PlayerSkillService playerSkillService = new PlayerSkillService();
             EnemySkillService enemySkillService = new EnemySkillService();
             PlayerSkill playerSkill = new PlayerSkill();
+            EnemySkill enemySkill = new EnemySkill();
+            ItemService itemService = new ItemService();
+            EquipmentService equipment = new EquipmentService();
             List<Enemy> enemies = new List<Enemy>();
             List<EnemySkill> enemySkills = new List<EnemySkill>();
             List<PlayerSkill> playerSkills = new List<PlayerSkill>();
             List<Player> players = new List<Player>();
+            List<Item> items = new List<Item>();
+            List<Equipment> equipmentList = new List<Equipment>();
+            Equipment equipment1 = equipment.AddNewEquipment();
+            equipmentList.Add(equipment1);
+
             Console.WriteLine("Inesrt your name:");
             string name = Console.ReadLine();
             players.Add( playerService.AddNewPlayer(name));
-            playerSkills.Add(playerSkillService.AddNewSkill(1, "Light punch", 10, 1));
-            playerSkills.Add(playerSkillService.AddNewSkill(2, "Heavy punch", 20, 1));
-            playerSkillService.AddNewSkillToPlayer(1, 1);
-            playerSkillService.AddNewSkillToPlayer(2, 1);
+            playerSkillService.AddNewSkill("Light punch", 15, 1,players,playerSkills);
+            playerSkillService.AddNewSkill("Heavy punch", 30, 1,players,playerSkills);
             Console.WriteLine("======================");
             Console.WriteLine("| WANDERER OF SOULS  |");
             Console.WriteLine("======================");
@@ -214,53 +200,97 @@ namespace WandererOfSouls
                     break;
             }
             enemies.Add( enemyService.AddNewEnemy("Bandit",1,50,1,0));
+            enemySkills.Add(enemySkillService.AddNewSkill("Sneak Attack", 15, enemies[0].Id, enemies, enemySkills));
+            enemySkills.Add(enemySkillService.AddNewSkill("Ramming", 10, enemies[0].Id, enemies, enemySkills));
             Console.WriteLine("The bandits quickly close in, ready for a fight. There's no escaping now - it's time to stand your ground!");
+            
             Console.WriteLine("The battle begins! The bandits are armed and aggressive, but you have no choice but to fight back and defend yourself against them.");
             while (true)
             {
                 Console.WriteLine(players[0].Name + "  Level:" + players[0].Level + "  HP:" + players[0].HP);
                 Console.WriteLine(enemies[0].Name + "  Level:" + enemies[0].Level + "  HP:" + enemies[0].HP);
-                if (players[0].HP <= 0)
+                while (true)
                 {
-                    Console.WriteLine("You lose the battle.Are you want to try again?");
-                }
-                actionService.choices("Attack", "Use an item", "Run", null);
-                choice = Console.ReadLine();
-                switch (choice)
-                {
-                    case "1":
-                        Console.WriteLine("What do you do?");
-                        for(int i = 0;i < playerSkills.Count;i++)
-                        {
-                            Console.WriteLine(i + 1 + ". " + playerSkills[i].Name);
-                        }
-                        Console.WriteLine("Choose an option.");
-                        choice = Console.ReadLine();
-                        int intChoice;
-                        int.TryParse(choice, out intChoice);
-                        if(intChoice <= playerSkills.Count && intChoice > 0)
-                        {
-                            switch (intChoice)
+                    actionService.choices("Attack", "Use an item", "Run", null);
+                    choice = Console.ReadLine();
+                    string choice1 = choice;
+                    switch (choice)
+                    {
+                        case "1":
+                            Console.WriteLine("What do you do?");
+                            for (int i = 0; i < playerSkills.Count; i++)
                             {
-                                case 1:
-                                    playerSkill.UseSkill(playerSkills[0].Id, enemies[0].Id);
-                                    break;
+                                Console.WriteLine(i + 1 + ". " + playerSkills[i].Name);
                             }
+                            Console.WriteLine("Choose an option.");
+                            choice = Console.ReadLine();
+                            int intChoice;
+                            int.TryParse(choice, out intChoice);
+                            if (intChoice <= playerSkills.Count && intChoice > 0)
+                            {
+                                switch (intChoice)
+                                {
+                                    case 1:
+                                        playerSkill.UseSkill(playerSkills[0].Id, enemies[0].Id, enemies, players, playerSkills);
+                                        break;
+                                    case 2:
+                                        playerSkill.UseSkill(playerSkills[1].Id, enemies[0].Id, enemies, players, playerSkills);
+                                        break;
+                                    case 3:
+                                        playerSkill.UseSkill(playerSkills[2].Id, enemies[0].Id, enemies, players, playerSkills);
+                                        break;
+                                    case 4:
+                                        playerSkill.UseSkill(playerSkills[3].Id, enemies[0].Id, enemies, players, playerSkills);
+                                        break;
+                                }
 
-                        }
+                            }
+                            break;
+                        case "2":
+                            Console.WriteLine("You dont have any Items.");
+                            break;
+                        case "3":
+                            Console.WriteLine("You can't escape because the bandits have surrounded you.");
+                            break;
+                    }
+                    if(choice1 == "1" || choice1 == "3")
+                    {
                         break;
+                    }
                 }
-                if (players[0].HP <= 0)
+                enemySkill.UseSkill(enemies[0].Id, enemies, players,enemySkills);
+                if (enemies[0].HP <= 0)
                 {
-                    Console.WriteLine("You lose the battle.");
+
+                    Console.WriteLine("you won the battle, and gain");
+                    Console.WriteLine("300XP");
+                    playerService.ExpForLvl(300);
+                    itemService.AddNewItem("Rusted sword", 2, 0, 5, 5,1);
+                    itemService.AddNewItem("Rusted chestplate",1,25,0,2,1);
+                    Item droppedItem1 = itemService.EnemyDrop(100, 0, null, null, null, null, null, null);
+                    Item droppedItem2 = itemService.EnemyDrop(100, 1, null, null, null, null, null, null);
+                    itemService.TextItemColor(null,0 );
+                    itemService.TextItemColor(null,1 );
+                    players[0].HP = players[0].MaxHP;
+                    enemies[0].HP = enemies[0].MaxHP;
+                    while (true)
+                    {
+                        actionService.choices("Open Inventory (You can open inventory by writing /inventory on choose actions)", "Leave", null, null);
+                        choice = Console.ReadLine();
+                        if (choice == "1")
+                        {
+                            itemService.InventoryView("/inventory",equipmentList,players);
+                        }
+                        else if (choice == "2")
+                        {
+                            break;
+                        }
+                    }
                     break;
                 }
-                else if (enemies[0].HP <= 0)
-                {
-                    Console.WriteLine("you won the battle");
-                }
             }
-            return 0;
+            Console.WriteLine("After you won fight you decide to go to forest.");
+            Console.WriteLine("Chcapter 1 ended");
         }
     }
 }

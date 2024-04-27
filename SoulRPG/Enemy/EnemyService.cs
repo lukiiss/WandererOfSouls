@@ -18,7 +18,8 @@ namespace WandererOfSouls
             {
                 lastId = enemies[enemiesCount - 1].Id;
             }
-            Enemy enemy = new Enemy() { Id = lastId, Name = name, Level = level, HP = healthPoints, Strenght = strenght, CritChance = critChance };
+            int currentId = lastId + 1;
+            Enemy enemy = new Enemy() { Id = currentId, Name = name, Level = level, HP = healthPoints, Strenght = strenght, CritChance = critChance };
             enemies.Add(enemy);
             return enemy;
         }

@@ -13,7 +13,5 @@ namespace WandererOfSouls
         int Damage { get; set; }
         decimal DamageMultiplayer { get; set; }
         int EntityId { get; set; }
-
-        void UseSkill(int skillId,int id);
     }
 }
